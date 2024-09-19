@@ -1,0 +1,41 @@
+# Refer to golangci-lint's example config file for more options and information:
+# https://github.com/golangci/golangci-lint/blob/master/.golangci.reference.yml
+
+run:
+  tests: true
+  timeout: 5m
+  allow-parallel-runners: true
+  modules-download-mode: readonly
+
+output:
+  formats:
+    - format: github-actions
+
+linters:
+  enable:
+    - goimports
+  presets:
+    - bugs
+    - comment
+    - complexity
+    - error
+    - metalinter
+    - module
+    - performance
+    - style
+    - test
+    - unused
+
+#linters:
+#  enable:
+#    - errcheck
+#    - goimports
+#    - golint
+#    - govet
+#    - staticcheck
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  fix: true
