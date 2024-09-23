@@ -4,6 +4,7 @@ import (
 	"encoding"
 	"encoding/hex"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/hadroncorp/geck/security/encryption"
@@ -43,6 +44,21 @@ func NewPageToken(encryptor encryption.Encryptor, queryType PaginationType, valu
 	encodedValue := make([]byte, hex.EncodedLen(len(ciphertext)))
 	hex.Encode(encodedValue, ciphertext)
 	return encodedValue, nil
+}
+
+// NewPageTokenOffset allocates a new PageToken instance using offset PaginationType.
+// If the given value is less than zero, then PageToken will be nil.
+func NewPageTokenOffset(encryptor encryption.Encryptor, value int) (PageToken, error) {
+	if value < 0 {
+		return nil, nil
+	}
+	return NewPageToken(encryptor, PaginationTypeOffset, strconv.Itoa(value))
+}
+
+// NewPageTokenKeySet allocates a new PageToken instance using key-set PaginationType.
+// If the given value is less than zero, then PageToken will be nil.
+func NewPageTokenKeySet(encryptor encryption.Encryptor, set KeySet) (PageToken, error) {
+	return NewPageToken(encryptor, PaginationTypeKeySet, set.String())
 }
 
 // Read decomposes encrypted token to a set of PaginationType and its value.
