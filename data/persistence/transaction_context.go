@@ -3,6 +3,8 @@ package persistence
 import (
 	"context"
 	"errors"
+
+	"github.com/hadroncorp/geck/systemerror"
 )
 
 type transactionContextType string
@@ -29,9 +31,12 @@ func CloseTransaction(ctx context.Context, srcErr error) error {
 	} else if err != nil {
 		return errors.Join(srcErr, err)
 	}
-	if srcErr != nil {
-		errRollback := tx.Rollback(ctx)
-		return errors.Join(srcErr, errRollback)
+	if srcErr == nil {
+		return tx.Commit(ctx)
 	}
-	return tx.Commit(ctx)
+	errRollback := tx.Rollback(ctx)
+	if srcErrors, ok := srcErr.(systemerror.Container); ok {
+		return errors.Join(append(srcErrors.Unwrap(), errRollback)...)
+	}
+	return errors.Join(srcErr, errRollback)
 }
